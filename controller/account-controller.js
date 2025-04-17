@@ -76,6 +76,10 @@ const changePassword = async (req, res, next) => {
 };
 
 const userCompletelyData = async (req, res, next) => {
+  const completeDataOfUser = await User.findById(req.user._id).select(
+    "dateOfBirth phonenumber province"
+  );
+
   const { dateOfBirth = null, phonenumber = [], province = null } = req.body;
 
   if (!!province && province !== "not-found") {
@@ -96,13 +100,15 @@ const userCompletelyData = async (req, res, next) => {
     return next(new AppError(409, "one of the phone numbers already exists"));
   }
 
-  req.user.dateOfBirth = dateOfBirth ?? req.user.dateOfBirth;
-  req.user.phonenumber = phonenumber.length ? phonenumber : req.user.phonenumber;
-  req.user.province = province ?? req.user.province;
+  completeDataOfUser.dateOfBirth = dateOfBirth ?? completeDataOfUser.dateOfBirth;
+  completeDataOfUser.phonenumber = phonenumber.length
+    ? phonenumber
+    : completeDataOfUser.phonenumber;
+  completeDataOfUser.province = province ?? completeDataOfUser.province;
 
-  await req.user.save({ validateModifiedOnly: true });
+  await completeDataOfUser.save({ validateModifiedOnly: true });
 
-  res.status(200).json({ status: "success", data: { user: req.user } });
+  res.status(200).json({ status: "success", data: { user: completeDataOfUser } });
 };
 
 module.exports = {

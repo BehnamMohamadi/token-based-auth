@@ -125,4 +125,16 @@ UserSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  try {
+    if (!this.passwordChangedAt) return false;
+
+    const changedTimestamp = Math.floor(this.passwordChangedAt.getTime() / 1000);
+    return JWTTimestamp < changedTimestamp;
+  } catch (error) {
+    console.error("Error in changedPasswordAfter:", error);
+    return true;
+  }
+};
+
 module.exports = model("User", UserSchema);

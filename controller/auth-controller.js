@@ -74,9 +74,11 @@ const protect = async (req, res, next) => {
     return next(new AppError(401, "the user blong to this token not exist"));
   }
 
-  // if (currentUser.changedPasswordAfter(decode.iat)) {
-  //   return next(new AppError(401, "password has been changed please try to login atfirst"));
-  // }
+  if (currentUser.changedPasswordAfter(decode.iat)) {
+    return next(
+      new AppError(401, "password has been changed please try to login atfirst")
+    );
+  }
   req.user = currentUser;
 
   next();
